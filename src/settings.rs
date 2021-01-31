@@ -4,8 +4,10 @@ extern crate dirs;
 extern crate exitcode;
 extern crate serde;
 
-use std::collections::HashMap;
 use log::debug;
+use std::collections::HashMap;
+
+const DEFAULT_CONNECTION_NAME: &str = "default";
 
 fn default_true() -> bool {
     return true;
@@ -22,19 +24,22 @@ pub struct Connection {
 pub struct Settings {
     #[serde(default = "default_true")]
     debug: bool,
-    connection: Connection,
+    connections: HashMap<String, Connection>,
 }
 
 impl Default for Settings {
     fn default() -> Self {
-        Settings {
+        let default_connection = Connection {
+            hosts: "0.0.0.0:9200".to_string(),
+            username: None,
+            password: None,
+        };
+        let mut connections = HashMap::new();
+        connections.insert(DEFAULT_CONNECTION_NAME.to_string(), default_connection);
+        return Settings {
             debug: true,
-            connection: Connection {
-                hosts: "0.0.0.0:9200".to_string(),
-                username: None,
-                password: None,
-            },
-        }
+            connections: connections,
+        };
     }
 }
 
@@ -50,7 +55,7 @@ impl Settings {
                 return Ok(Default::default());
             }
             Ok(path) => {
-                debug!("Using \"{}\" as path to load config from", path.to_str().unwrap());
+                debug!("Using \"{}\" as a path config file", path.to_str().unwrap());
                 let mut settings = config::Config::default();
                 settings
                     .merge(config::File::with_name(path.to_str().unwrap()))
@@ -60,7 +65,7 @@ impl Settings {
                 println!(
                     "{:?}",
                     settings
-                        .get::<HashMap<String, String>>("connection")
+                        .get::<HashMap<String, Connection>>("connections")
                         .unwrap()
                 );
                 return settings.try_into();
@@ -83,10 +88,7 @@ impl Settings {
         }
 
         let home_path = dirs::home_dir().unwrap();
-        let default_config_path = home_path
-            .join(".config")
-            .join("elser")
-            .join("config.yaml");
+        let default_config_path = home_path.join(".config").join("elser").join("config.yaml");
         if default_config_path.exists() && default_config_path.is_file() {
             return Ok(default_config_path);
         }

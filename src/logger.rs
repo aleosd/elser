@@ -1,7 +1,7 @@
 extern crate chrono;
 extern crate log;
 
-use log::{Level, Metadata, Record, LevelFilter};
+use log::{Level, LevelFilter, Metadata, Record};
 use std::str::FromStr;
 
 pub static LOGGER: Logger = Logger;
@@ -32,7 +32,5 @@ impl log::Log for Logger {
 
 pub fn setup_logger(log_level: &str) {
     log::set_logger(&LOGGER).unwrap();
-    log::set_max_level(
-        LevelFilter::from_str(log_level).unwrap_or(LevelFilter::Warn),
-    );
+    log::set_max_level(LevelFilter::from_str(log_level).unwrap_or(LevelFilter::Warn));
 }

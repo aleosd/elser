@@ -1,13 +1,13 @@
-use std::path::PathBuf;
 use log::debug;
+use std::path::PathBuf;
 extern crate serde;
 
 #[macro_use]
 extern crate serde_derive;
 
 mod cli;
-mod settings;
 mod logger;
+mod settings;
 
 fn main() {
     let args = cli::parse_args();

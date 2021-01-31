@@ -15,11 +15,11 @@ pub fn parse_args() -> clap::ArgMatches {
         )
         .arg(
             Arg::new("log-level")
-            .short('l')
-            .long("log-level")
-            .takes_value(true)
-            .possible_values(&["info", "debug", "warn", "error"])
-            .about("Set log level"),
+                .short('l')
+                .long("log-level")
+                .takes_value(true)
+                .possible_values(&["info", "debug", "warn", "error"])
+                .about("Set log level"),
         )
         .get_matches();
 }
