@@ -16,15 +16,30 @@ fn default_true() -> bool {
 #[derive(Debug, Deserialize)]
 pub struct Connection {
     hosts: String,
-    username: Option<String>,
-    password: Option<String>,
+    pub username: Option<String>,
+    pub password: Option<String>,
+}
+
+impl Connection {
+    pub fn has_auth(&self) -> bool {
+        return self.username.is_some() && self.password.is_some();
+    }
+
+    pub fn get_url(&self) -> String {
+        if self.hosts.starts_with("http") {
+            return self.hosts.to_string();
+        }
+        let result = vec!["http://".into(), self.hosts.to_string()];
+        let url = result.join("");
+        return url;
+    }
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Settings {
     #[serde(default = "default_true")]
     debug: bool,
-    connections: HashMap<String, Connection>,
+    pub connections: HashMap<String, Connection>,
 }
 
 impl Default for Settings {
@@ -93,5 +108,17 @@ impl Settings {
             return Ok(default_config_path);
         }
         return Err("Failed to locate config file".to_string());
+    }
+
+    pub fn get_connection(&self, connection_name: Option<&str>) -> Result<&Connection, String> {
+        let cleaned_conn_name = connection_name.unwrap_or("default");
+        if self.connections.contains_key(cleaned_conn_name) {
+            debug!("Using connection \"{}\"", cleaned_conn_name);
+            return Ok(self.connections.get(cleaned_conn_name).unwrap());
+        }
+        return Err(format!(
+            "Cannot find connection by name \"{}\"",
+            cleaned_conn_name
+        ));
     }
 }

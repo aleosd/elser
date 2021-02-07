@@ -14,6 +14,9 @@ serde = "^1.0.8"
 exitcode = "1.1.2"
 log = "*"
 chrono = "*"
+elasticsearch = "7.10.1-alpha.1"
+url = "*"
+tokio = { version = "*", features = ["full"] }
 
 [dependencies.config]
 version = "0.10.1"
