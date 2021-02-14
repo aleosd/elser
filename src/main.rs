@@ -20,8 +20,6 @@ async fn main() {
     println!("{:?}", elastic_connection);
     let elastic_client =
         elastic::client::get_elastic_client(elastic_connection.as_ref().unwrap()).unwrap();
-    let cluster_info = elastic_client.info();
-    let response = cluster_info.send().await.unwrap();
-    let content = response.text().await.unwrap();
-    println!("{}", content);
+    let elser = elastic::elser::Elser::new(elastic_client);
+    elser.info().await;
 }
